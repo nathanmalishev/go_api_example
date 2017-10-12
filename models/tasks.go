@@ -24,22 +24,22 @@ type (
 		Tags        []string      `json:"tags,omitempty"`
 	}
 	TaskStore interface {
-		GetAllTasks(*DataStore) ([]Task, error)
+		GetAllTasks() ([]Task, error)
 	}
 )
 
-func (*DataStore) GetAllTasks() ([]Task, error) {
-	return nil, nil
+/* task specific stuff */
+
+// Returns all the tasks, a DataStore knows about
+func (d *DataStore) GetAllTasks() ([]Task, error) {
+	tasks := []Task{}
+	err := d.C(collectionName).Find(nil).Limit(100).All(&tasks)
+	if err != nil {
+		return nil, err
+	}
+	return tasks, nil
 }
 
-//[> tasks specific models <]
-
-//func (d *DataStore) FindAllNotes() []models.Task {
-//tasks := []models.Task{}
-//itr := d.DB(common.Config.DbName).C(collectionName).Find(nil).Limit(100).Iter()
-//err := itr.All(&tasks)
-//if err != nil {
-//log.Fatal(err)
-//}
-//return tasks
-//}
+func (d *DataStore) InsertTask(t Task) error {
+	return d.C(collectionName).Insert(t)
+}

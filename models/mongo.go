@@ -3,6 +3,7 @@ package models
 import (
 	"log"
 
+	"github.com/nathanmalishev/taskmanager/common"
 	mgo "gopkg.in/mgo.v2"
 )
 
@@ -36,3 +37,6 @@ func (d *DataStore) Close() {
 }
 
 /* general database functions */
+func (d *DataStore) C(collection string) *mgo.Collection {
+	return d.Session.DB(common.AppConfig.DbName).C(collection)
+}

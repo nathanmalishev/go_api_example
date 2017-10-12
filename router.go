@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/nathanmalishev/taskmanager/controllers"
 	"github.com/nathanmalishev/taskmanager/models"
 	"github.com/urfave/negroni"
 )
@@ -23,7 +24,7 @@ func InitRoutes(store *models.DataStore) http.Handler {
 	router.Handle("/users/login", dummy()).Methods("POST")
 	/* Task routes  */
 	taskRouter := mux.NewRouter().StrictSlash(false)
-	taskRouter.Handle("/tasks", dummy()).Methods("GET")
+	taskRouter.Handle("/tasks", controllers.GetAllTasks(store)).Methods("GET")
 	taskRouter.Handle("/tasks/{id}", dummy()).Methods("GET")
 	taskRouter.Handle("/tasks/{id}", dummy()).Methods("DELETE")
 	taskRouter.Handle("/tasks", dummy()).Methods("POST")
