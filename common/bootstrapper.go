@@ -2,7 +2,6 @@ package common
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 )
@@ -13,6 +12,7 @@ type Config struct {
 	MongoUsername string
 	MongoPassword string
 	DbName        string
+	JwtSecret     []byte
 }
 
 /* Global for common package is the AppConfig */
@@ -35,10 +35,18 @@ func readConfig(filename string) *Config {
 func readEnv(c *Config) {
 	c.MongoUsername = os.Getenv("MONGO_USERNAME")
 	c.MongoPassword = os.Getenv("MONGO_PASSWORD")
+	if c.MongoPassword == "" || c.MongoUsername == "" {
+		log.Println("Please note these env variables haven't been set, MONGO_USERNAME & MONGO_PASSWORD")
+	}
+
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		log.Fatal("You must set your env variable JWT_SECRET")
+	}
+	c.JwtSecret = []byte(jwtSecret)
 }
 
 func init() {
 	AppConfig = readConfig("common/config.json")
 	readEnv(AppConfig)
-	fmt.Println(AppConfig)
 }
