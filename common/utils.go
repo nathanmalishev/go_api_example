@@ -18,8 +18,9 @@ type (
 )
 
 var (
-	InvalidData = "Could not decode data"
-	FetchError  = "Could not fetch data"
+	InvalidData  = "Could not decode data"
+	FetchError   = "Could not fetch data"
+	JwtHTTPError = "No valid JWT attached"
 )
 
 func DisplayAppError(w http.ResponseWriter, handlerError error, message string, code int) {

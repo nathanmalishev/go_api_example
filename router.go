@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/nathanmalishev/taskmanager/common"
 	"github.com/nathanmalishev/taskmanager/controllers"
 	"github.com/nathanmalishev/taskmanager/models"
 	"github.com/urfave/negroni"
@@ -17,11 +18,13 @@ func dummy() http.Handler {
 	})
 }
 
-func InitRoutes(store *models.DataStore) http.Handler {
+func InitRoutes(store *models.DataStore, authModule *common.Auth) http.Handler {
 	router := mux.NewRouter().StrictSlash(false)
+
 	/* User routes */
 	router.Handle("/users/register", dummy()).Methods("POST")
 	router.Handle("/users/login", dummy()).Methods("POST")
+
 	/* Task routes  */
 	taskRouter := mux.NewRouter().StrictSlash(false)
 	taskRouter.Handle("/tasks", controllers.GetAllTasks(store)).Methods("GET")
@@ -30,6 +33,7 @@ func InitRoutes(store *models.DataStore) http.Handler {
 	taskRouter.Handle("/tasks", dummy()).Methods("POST")
 	taskRouter.Handle("/tasks/{id}", dummy()).Methods("PUT")
 	taskRouter.Handle("/tasks/users/{id}", dummy()).Methods("GET")
+
 	/* Notes routes  */
 	notesRouter := mux.NewRouter().StrictSlash(false)
 	notesRouter.Handle("/notes", dummy()).Methods("GET")
@@ -38,11 +42,13 @@ func InitRoutes(store *models.DataStore) http.Handler {
 	notesRouter.Handle("/notes", dummy()).Methods("POST")
 	notesRouter.Handle("/notes/{id}", dummy()).Methods("PUT")
 	notesRouter.Handle("/notes/tasks/{id}", dummy()).Methods("GET")
+
 	/* middleware */
-	common := negroni.New(
+	commonMidleware := negroni.New(
 		negroni.NewLogger(),
 	) // will add auth middleware to these routes soon
 	router.PathPrefix("/notes").Handler(negroni.New(
+		common.WithAuth(authModule),
 		negroni.Wrap(notesRouter),
 	))
 	router.PathPrefix("/tasks").Handler(negroni.New(
@@ -50,6 +56,7 @@ func InitRoutes(store *models.DataStore) http.Handler {
 	))
 	// common wraps all routes in default middleware
 	// this includes all API hits
-	common.UseHandler(router)
-	return common
+	commonMidleware.UseHandler(router)
+
+	return commonMidleware
 }

@@ -1,18 +1,33 @@
 package common
 
 import (
+	"errors"
+	"fmt"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
-// generates a new JWT token
-func GenerateJWT(name string, role string, signKey []byte) (string, error) {
-	claims := struct {
-		Role string
-		Name string
+type (
+	Authorizer interface {
+		GenerateJWT(string, string) (string, error)
+		Authorize(string) (*jwt.Token, error)
+	}
+	Auth struct {
+		Secret        []byte
+		SigningMethod jwt.SigningMethod
+	}
+
+	AppClaims struct {
+		Role     string
+		Username string
 		jwt.StandardClaims
-	}{
+	}
+)
+
+// generates a new JWT token
+func (a *Auth) GenerateJWT(name string, role string) (string, error) {
+	claims := AppClaims{
 		name,
 		role,
 		jwt.StandardClaims{
@@ -22,10 +37,36 @@ func GenerateJWT(name string, role string, signKey []byte) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
-	jwt, err := token.SignedString(signKey)
+	jwt, err := token.SignedString(a.Secret)
 	if err != nil {
 		return "", err
 	}
 
 	return jwt, nil
+}
+
+// Processes jwtString and returns process token if valid
+func (a *Auth) Authorize(jwtStr string) (*jwt.Token, error) {
+
+	token, err := jwt.ParseWithClaims(jwtStr, &AppClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return a.Secret, nil
+	})
+	// Check if there was an error in parsing...
+	if err != nil {
+		return nil, errors.New("Error parsing jwt token")
+	}
+
+	if a.SigningMethod != nil && a.SigningMethod.Alg() != token.Header["alg"] {
+		message := fmt.Sprintf("Expected %s signing method but token specified %s",
+			a.SigningMethod.Alg(),
+			token.Header["alg"])
+		return nil, errors.New(message)
+	}
+
+	// Check if the parsed token is valid...
+	if !token.Valid {
+		return nil, errors.New("Token is invalid")
+	}
+
+	return token, nil
 }
