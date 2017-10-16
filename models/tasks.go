@@ -6,11 +6,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-const collectionName = "tasks"
-
-// move each model into its respective file
-// write an interface for each function we need
-// Datastore will implement each of these functions
+const cNameTasks = "tasks"
 
 type (
 	Task struct {
@@ -33,7 +29,7 @@ type (
 // Returns all the tasks, a DataStore knows about
 func (d *DataStore) GetAllTasks() ([]Task, error) {
 	tasks := []Task{}
-	err := d.C(collectionName).Find(nil).Limit(100).All(&tasks)
+	err := d.C(cNameTasks).Find(nil).Limit(100).All(&tasks)
 	if err != nil {
 		return nil, err
 	}
@@ -41,5 +37,5 @@ func (d *DataStore) GetAllTasks() ([]Task, error) {
 }
 
 func (d *DataStore) InsertTask(t Task) error {
-	return d.C(collectionName).Insert(t)
+	return d.C(cNameTasks).Insert(t)
 }

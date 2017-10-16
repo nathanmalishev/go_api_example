@@ -36,6 +36,11 @@ func (d *DataStore) Close() {
 	d.Session.Close()
 }
 
+/* indexs */
+func (d *DataStore) InitIndexs() error {
+	return d.UserIndexs()
+}
+
 /* general database functions */
 func (d *DataStore) C(collection string) *mgo.Collection {
 	return d.Session.DB(common.AppConfig.DbName).C(collection)

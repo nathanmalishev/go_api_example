@@ -22,6 +22,12 @@ func main() {
 		Timeout:  time.Second * 5,
 	})
 
+	/* initialize indexs */
+	err := store.InitIndexs()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	/* create authorizer used to decode/encode jwt's */
 	authModule := &common.Auth{
 		Secret:        common.AppConfig.JwtSecret,
