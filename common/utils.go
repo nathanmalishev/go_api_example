@@ -36,3 +36,9 @@ func DisplayAppError(w http.ResponseWriter, handlerError error, message string, 
 		w.Write(j)
 	}
 }
+
+func WriteJson(w http.ResponseWriter, code int, json []byte) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	w.Write(json)
+}
