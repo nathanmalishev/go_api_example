@@ -26,5 +26,11 @@ func Register(d *models.DataStore, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	common.WriteJson(w, http.StatusCreated, []byte("Successfully created user"))
+	createdUser := struct {
+		Username string `json:"username"`
+		Email    string `json:"email"`
+		Role     string `json:"role"`
+	}{body.UserName, body.Email, body.Role}
+
+	common.WriteJson(w, "Succesfully registered user", createdUser, http.StatusCreated)
 }

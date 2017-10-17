@@ -2,6 +2,7 @@ package common
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -10,10 +11,11 @@ type (
 	appError struct {
 		Error      string `json:"error"`
 		Message    string `json:"message"`
-		HttpStatus int    `json:"status"`
+		HttpStatus int    `json:"code"`
 	}
-	errorResource struct {
-		Error appError `json:"error"`
+	AppResponse struct {
+		Message string      `json:"message"`
+		Data    interface{} `json:"data"`
 	}
 )
 
@@ -32,13 +34,26 @@ func DisplayAppError(w http.ResponseWriter, handlerError error, message string, 
 	log.Printf("AppError]: %s\n", handlerError)
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(code)
-	if j, err := json.Marshal(errorResource{Error: errObj}); err == nil {
+	if j, err := json.Marshal(errObj); err == nil {
 		w.Write(j)
 	}
 }
 
-func WriteJson(w http.ResponseWriter, code int, json []byte) {
+func WriteJson(w http.ResponseWriter, message string, data interface{}, code int) {
+
+	mess := AppResponse{
+		Message: message,
+		Data:    data,
+	}
+	fmt.Println(mess)
+	j, err := json.Marshal(mess)
+	fmt.Println(j)
+	if err != nil {
+		DisplayAppError(w, err, InvalidData, http.StatusInternalServerError)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	w.Write(json)
+	w.Write(j)
 }
