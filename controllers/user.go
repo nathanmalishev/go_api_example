@@ -8,7 +8,7 @@ import (
 	"github.com/nathanmalishev/taskmanager/models"
 )
 
-func Register(d *models.DataStore, w http.ResponseWriter, r *http.Request) {
+func Register(authMod *common.Auth, d *models.DataStore, w http.ResponseWriter, r *http.Request) {
 
 	//get data from request
 	decoder := json.NewDecoder(r.Body)
@@ -20,9 +20,20 @@ func Register(d *models.DataStore, w http.ResponseWriter, r *http.Request) {
 	}
 
 	//create new user
-	err = d.CreateUser(body)
+	userId, err := d.CreateUser(body)
 	if err != nil {
 		common.DisplayAppError(w, err, "Invalid user data", http.StatusInternalServerError)
+		return
+	}
+
+	//create JWT
+	jwt, err := authMod.GenerateJWT(
+		body.UserName,
+		body.Role,
+		userId,
+	)
+	if err != nil {
+		common.DisplayAppError(w, err, "fail up", http.StatusInternalServerError)
 		return
 	}
 
@@ -30,7 +41,12 @@ func Register(d *models.DataStore, w http.ResponseWriter, r *http.Request) {
 		Username string `json:"username"`
 		Email    string `json:"email"`
 		Role     string `json:"role"`
-	}{body.UserName, body.Email, body.Role}
-
+		JWT      string `json:"jwt"`
+	}{
+		body.UserName,
+		body.Email,
+		body.Role,
+		jwt,
+	}
 	common.WriteJson(w, "Succesfully registered user", createdUser, http.StatusCreated)
 }

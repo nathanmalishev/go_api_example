@@ -6,6 +6,7 @@ import (
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type (
@@ -19,24 +20,33 @@ type (
 	}
 
 	AppClaims struct {
+		UserClaims
+		jwt.StandardClaims
+	}
+
+	//Used in middleware and attached to the context
+	UserClaims struct {
 		Role     string
 		Username string
-		jwt.StandardClaims
+		UserId   bson.ObjectId
 	}
 )
 
 // generates a new JWT token
-func (a *Auth) GenerateJWT(name string, role string) (string, error) {
+func (a *Auth) GenerateJWT(name string, role string, userId bson.ObjectId) (string, error) {
 	claims := AppClaims{
-		name,
-		role,
+		UserClaims{
+			Username: name,
+			Role:     role,
+			UserId:   userId,
+		},
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 4).Unix(),
 			Issuer:    "nathanmalishev/taskmanager",
 		},
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
+	token := jwt.NewWithClaims(a.SigningMethod, claims)
 	jwt, err := token.SignedString(a.Secret)
 	if err != nil {
 		return "", err

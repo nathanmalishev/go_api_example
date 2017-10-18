@@ -31,7 +31,7 @@ func main() {
 	/* create authorizer used to decode/encode jwt's */
 	authModule := &common.Auth{
 		Secret:        common.AppConfig.JwtSecret,
-		SigningMethod: jwt.SigningMethodRS256,
+		SigningMethod: jwt.SigningMethodHS512,
 	}
 
 	server := &http.Server{

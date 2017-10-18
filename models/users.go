@@ -26,26 +26,27 @@ type (
 const cNameUsers = "users"
 
 /* User store database interactions */
-func (d *DataStore) CreateUser(user User) error {
+func (d *DataStore) CreateUser(user User) (bson.ObjectId, error) {
 
 	//Data check
 	//Must have UserName, password, email & role --- in this example we can obv have weak passwords 😿
 	if user.Password == "" || user.Role == "" || user.Email == "" || user.UserName == "" {
-		return errors.New("Invalid user data, field is missing")
+		return "", errors.New("Invalid user data, field is missing")
 	}
 
 	// hash password
 	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return err
+		return "", err
 	}
 	user.HashPassword = hash
+	user.Id = bson.NewObjectId()
 
 	err = d.C(cNameUsers).Insert(user)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	return user.Id, nil
 }
 
 func (d *DataStore) UserIndexs() error {
