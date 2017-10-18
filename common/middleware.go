@@ -27,11 +27,15 @@ func WithAuth(a Authorizer) negroni.Handler {
 			return
 		}
 
-		//handle claims
-		username := ""
+		userContext := UserClaims{}
+		// handle claims
 		if claims, ok := token.Claims.(AppClaims); ok {
 			fmt.Printf("%v", claims.Username)
-			username = claims.Username
+			userContext = UserClaims{
+				Username: claims.Username,
+				Role:     claims.Role,
+				UserId:   claims.UserId,
+			}
 		} else {
 			fmt.Printf("Error decoding claims, token:%s, err:", token, err)
 			http.Error(rw, JwtHTTPError, http.StatusUnauthorized)
@@ -39,7 +43,8 @@ func WithAuth(a Authorizer) negroni.Handler {
 		}
 
 		//set context and next
-		ctx := context.WithValue(r.Context(), "user", username)
+		ctx := context.WithValue(r.Context(), "userContext", userContext)
+
 		next(rw, r.WithContext(ctx))
 	})
 }
