@@ -20,7 +20,7 @@ type (
 		Tags        []string      `json:"tags,omitempty"`
 	}
 	TaskStore interface {
-		GetAllTasks() ([]Task, error)
+		GetAllTasksByUserId(bson.ObjectId) ([]Task, error)
 	}
 )
 

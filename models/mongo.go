@@ -7,9 +7,18 @@ import (
 	mgo "gopkg.in/mgo.v2"
 )
 
-type DataStore struct {
-	Session *mgo.Session
-}
+type (
+	DataStorer interface {
+		GetStore() *DataStore
+		Close()
+		InitIndexs() error
+		UserStore
+		TaskStore
+	}
+	DataStore struct {
+		Session *mgo.Session
+	}
+)
 
 /* getters / setters */
 func CreateStore(dialInfo *mgo.DialInfo) *DataStore {

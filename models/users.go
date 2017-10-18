@@ -18,8 +18,8 @@ type (
 		HashPassword []byte        `json:"hashPassword,omitempty"`
 	}
 	UserStore interface {
-		GetAll() ([]User, error)
-		CreateUser(User) error
+		//GetAll() ([]User, error)
+		CreateUser(User) (bson.ObjectId, error)
 	}
 )
 

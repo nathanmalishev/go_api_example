@@ -18,13 +18,13 @@ func dummy() http.Handler {
 	})
 }
 
-func InitRoutes(store *models.DataStore, authModule *common.Auth) http.Handler {
+func InitRoutes(store models.DataStorer, authModule common.Authorizer) http.Handler {
 	router := mux.NewRouter().StrictSlash(false)
 
 	/* User routes */
 	router.Handle("/users", withDbAndAuth(authModule, store, controllers.Register)).Methods("POST")
-	router.Handle("/users/login", dummy()).Methods("POST")
-	router.Handle("/users", withDb(store, controllers.GetUser)).Methods("GET")
+	router.Handle("/users/login", withDbAndAuth(authModule, store, controllers.Login)).Methods("POST")
+	//router.Handle("/users", withDb(store, controllers.GetUser)).Methods("GET")
 
 	/* Task routes  */
 	taskRouter := mux.NewRouter().StrictSlash(false)
@@ -55,7 +55,7 @@ func InitRoutes(store *models.DataStore, authModule *common.Auth) http.Handler {
 // With db wraps each controller that needs the db with a new session
 // this is important to handle requests concurrently
 // We want the actual function to recieve dataStore so i don't think you can middleware it
-func withDb(store *models.DataStore, fn func(*models.DataStore, http.ResponseWriter, *http.Request)) http.Handler {
+func withDb(store models.DataStorer, fn func(models.DataStorer, http.ResponseWriter, *http.Request)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		newStore := store.GetStore() // when we return the store, we copy the session
 		defer newStore.Close()       // must close the session, or we will leave connections open
@@ -66,13 +66,13 @@ func withDb(store *models.DataStore, fn func(*models.DataStore, http.ResponseWri
 //We will need withAuth module, for register/login routes
 //trying to not pollute global name space so going to need another middleware
 func withDbAndAuth(
-	authModule *common.Auth,
-	store *models.DataStore,
-	fn func(*common.Auth, *models.DataStore, http.ResponseWriter, *http.Request),
+	authModule common.Authorizer,
+	store models.DataStorer,
+	fn func(common.Authorizer, models.UserStore, http.ResponseWriter, *http.Request),
 ) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		newStore := store.GetStore()
 		defer newStore.Close()
-		fn(authModule, newStore, w, r)
+		fn(authModule, models.UserStore(newStore), w, r)
 	})
 }

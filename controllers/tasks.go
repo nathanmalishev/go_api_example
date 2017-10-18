@@ -8,7 +8,7 @@ import (
 )
 
 // gets all tasks for a given user
-func GetAllTasks(d *models.DataStore, w http.ResponseWriter, r *http.Request) {
+func GetAllTasks(d models.DataStorer, w http.ResponseWriter, r *http.Request) {
 
 	userClaims := r.Context().Value("userContext").(*common.UserClaims)
 
