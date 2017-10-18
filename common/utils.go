@@ -2,7 +2,6 @@ package common
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 )
@@ -45,9 +44,7 @@ func WriteJson(w http.ResponseWriter, message string, data interface{}, code int
 		Message: message,
 		Data:    data,
 	}
-	fmt.Println(mess)
 	j, err := json.Marshal(mess)
-	fmt.Println(j)
 	if err != nil {
 		DisplayAppError(w, err, InvalidData, http.StatusInternalServerError)
 		return
