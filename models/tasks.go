@@ -11,7 +11,7 @@ const cNameTasks = "tasks"
 type (
 	Task struct {
 		Id          bson.ObjectId `bson:"_id,omitempty" json:"id"`
-		CreatedBy   string        `json:"createdby"`
+		UserId      bson.ObjectId `bson:"userid" json:"userid"`
 		Name        string        `json:"name"`
 		Description string        `json:"description"`
 		CreatedOn   time.Time     `json:"createdon,omitempty"`
