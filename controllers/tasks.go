@@ -7,8 +7,12 @@ import (
 	"github.com/nathanmalishev/taskmanager/models"
 )
 
+// gets all tasks for a given user
 func GetAllTasks(d *models.DataStore, w http.ResponseWriter, r *http.Request) {
-	tasks, err := d.GetAllTasks()
+
+	userClaims := r.Context().Value("userContext").(*common.UserClaims)
+
+	tasks, err := d.GetAllTasksByUserId(userClaims.UserId)
 	if err != nil {
 		common.DisplayAppError(w, err, common.FetchError, 500)
 		return

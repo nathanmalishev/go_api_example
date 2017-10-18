@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/nathanmalishev/taskmanager/common"
@@ -49,4 +50,14 @@ func Register(authMod *common.Auth, d *models.DataStore, w http.ResponseWriter, 
 		jwt,
 	}
 	common.WriteJson(w, "Succesfully registered user", createdUser, http.StatusCreated)
+}
+
+func GetUser(d *models.DataStore, w http.ResponseWriter, r *http.Request) {
+
+	//get user info from request
+	userInfo := r.Context().Value("userContext")
+	fmt.Println(userInfo)
+
+	common.WriteJson(w, "success", userInfo, http.StatusOK)
+
 }

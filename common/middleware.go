@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/urfave/negroni"
 )
@@ -13,24 +14,29 @@ import (
 func WithAuth(a Authorizer) negroni.Handler {
 	return negroni.HandlerFunc(func(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 		//check jwt
-		auth := r.Header.Get("Authorization")
-		if auth == "" {
+		var token string
+		tokens, ok := r.Header["Authorization"]
+		if ok && len(tokens) >= 1 {
+			token = tokens[0]
+			token = strings.TrimPrefix(token, "Bearer ")
+		}
+		if token == "" {
 			http.Error(rw, JwtHTTPError, http.StatusUnauthorized)
 			return
 		}
 
 		// authorize
-		token, err := a.Authorize(auth)
+		jwtToken, err := a.Authorize(token)
 		if err != nil {
-			fmt.Printf("Error decoding token:%s, err:%s\n", auth, err)
+			fmt.Printf("Error decoding token:%s, err:%s\n", jwtToken, err)
 			http.Error(rw, JwtHTTPError, http.StatusUnauthorized)
 			return
 		}
 
 		userContext := UserClaims{}
 		// handle claims
-		if claims, ok := token.Claims.(AppClaims); ok {
-			fmt.Printf("%v", claims.Username)
+		if claims, ok := jwtToken.Claims.(*AppClaims); ok {
+			//fmt.Printf("%s, %s, %s\n", claims.Username, claims.Role, claims.UserId)
 			userContext = UserClaims{
 				Username: claims.Username,
 				Role:     claims.Role,
@@ -43,7 +49,7 @@ func WithAuth(a Authorizer) negroni.Handler {
 		}
 
 		//set context and next
-		ctx := context.WithValue(r.Context(), "userContext", userContext)
+		ctx := context.WithValue(r.Context(), "userContext", &userContext)
 
 		next(rw, r.WithContext(ctx))
 	})

@@ -27,9 +27,9 @@ type (
 /* task specific stuff */
 
 // Returns all the tasks, a DataStore knows about
-func (d *DataStore) GetAllTasks() ([]Task, error) {
+func (d *DataStore) GetAllTasksByUserId(userId bson.ObjectId) ([]Task, error) {
 	tasks := []Task{}
-	err := d.C(cNameTasks).Find(nil).Limit(100).All(&tasks)
+	err := d.C(cNameTasks).Find(bson.M{"UserId": userId}).Limit(100).All(&tasks)
 	if err != nil {
 		return nil, err
 	}

@@ -11,7 +11,7 @@ import (
 
 type (
 	Authorizer interface {
-		GenerateJWT(string, string) (string, error)
+		GenerateJWT(string, string, bson.ObjectId) (string, error)
 		Authorize(string) (*jwt.Token, error)
 	}
 	Auth struct {
