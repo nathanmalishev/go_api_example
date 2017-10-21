@@ -9,6 +9,13 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type CreatedUser struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Role     string `json:"role"`
+	JWT      string `json:"jwt"`
+}
+
 /* Registers a user that includes all the common fields from models.User */
 func Register(authMod common.Authorizer, d models.UserStore, w http.ResponseWriter, r *http.Request) {
 
@@ -38,19 +45,13 @@ func Register(authMod common.Authorizer, d models.UserStore, w http.ResponseWrit
 		common.DisplayAppError(w, err, "fail up", http.StatusInternalServerError)
 		return
 	}
-
-	createdUser := struct {
-		Username string `json:"username"`
-		Email    string `json:"email"`
-		Role     string `json:"role"`
-		JWT      string `json:"jwt"`
-	}{
+	returnUser := CreatedUser{
 		body.UserName,
 		body.Email,
 		body.Role,
 		jwt,
 	}
-	common.WriteJson(w, "Succesfully registered user", createdUser, http.StatusCreated)
+	common.WriteJson(w, "Succesfully registered user", returnUser, http.StatusCreated)
 }
 
 func GetUser(d *models.DataStore, w http.ResponseWriter, r *http.Request) {
@@ -83,9 +84,23 @@ func Login(authMod common.Authorizer, d models.UserStore, w http.ResponseWriter,
 		return
 	}
 
-	user.HashPassword = nil
-	user.Password = ""
-	user.Id = ""
-	common.WriteJson(w, "success", user, http.StatusOK)
+	// generate a fresh JWT
+	jwt, err := authMod.GenerateJWT(
+		user.UserName,
+		user.Role,
+		user.Id,
+	)
+	if err != nil {
+		common.DisplayAppError(w, err, "Please try again later", http.StatusInternalServerError)
+		return
+	}
+	returnUser := CreatedUser{
+		user.UserName,
+		user.Email,
+		user.Role,
+		jwt,
+	}
+
+	common.WriteJson(w, "success", returnUser, http.StatusOK)
 
 }

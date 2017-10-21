@@ -1,6 +1,7 @@
 package controllers_test
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -97,6 +98,21 @@ func UserShouldLogin(r *mux.Router) func(t *testing.T) {
 		r.ServeHTTP(w, req)
 		if w.Code != 200 {
 			t.Errorf("HTTP Status expected: 200, got: %d", w.Code)
+		}
+		// if all correct fields are not present
+		result := struct {
+			Message string
+			Data    controllers.CreatedUser
+		}{}
+		err = json.NewDecoder(w.Body).Decode(&result)
+		if err != nil {
+			t.Error(err)
+		}
+		if result.Data.Username != "nathan" || result.Data.Email != "nathan.email" || result.Data.Role != "student" {
+			t.Fail()
+		}
+		if result.Data.JWT == "" || result.Message != "success" {
+			t.Fail()
 		}
 	}
 }
