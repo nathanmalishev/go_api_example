@@ -8,8 +8,7 @@ import (
 
 type (
 	appError struct {
-		Error      string `json:"error"`
-		Message    string `json:"message"`
+		Message    string `json:"error"`
 		HttpStatus int    `json:"code"`
 	}
 	AppResponse struct {
@@ -26,7 +25,7 @@ var (
 
 func DisplayAppError(w http.ResponseWriter, handlerError error, message string, code int) {
 	errObj := appError{
-		Error:      handlerError.Error(),
+		//	Error:      handlerError.Error(),
 		Message:    message,
 		HttpStatus: code,
 	}

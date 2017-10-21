@@ -28,7 +28,7 @@ func TestMain(m *testing.M) {
 	os.Exit(retCode)
 }
 
-func TestFindUserByUsername(t *testing.T) {
+func TestFindUser(t *testing.T) {
 	dataStore := models.DataStore{}
 	dataStore.Session = server.Session()
 
@@ -44,7 +44,7 @@ func UserShouldExist(dataStore *models.DataStore) func(t *testing.T) {
 		if err := dataStore.C("users").Insert(userExists); err != nil {
 			t.Error(err)
 		}
-		user, err := dataStore.FindUserByUsername(models.User{UserName: "nathan"})
+		user, err := dataStore.FindUser(models.User{UserName: "nathan"})
 		if err != nil {
 			t.Error(err)
 		}
@@ -60,7 +60,7 @@ func UserShouldNotExist(dataStore *models.DataStore) func(t *testing.T) {
 		if err := dataStore.C("users").Insert(userExists); err != nil {
 			t.Error(err)
 		}
-		_, err := dataStore.FindUserByUsername(models.User{UserName: "nathan1"})
+		_, err := dataStore.FindUser(models.User{UserName: "nathan1"})
 		if err != nil {
 			if err.Error() != "not found" {
 				t.Error(err)

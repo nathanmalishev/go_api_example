@@ -10,17 +10,17 @@ import (
 
 type (
 	User struct {
-		Id           bson.ObjectId `bson:"_id,omitempty" json:"id"`
+		Id           bson.ObjectId `bson:"_id,omitempty" json:"id,omitempty"`
 		UserName     string        `json:"username"`
 		Email        string        `json:"email"`
 		Role         string        `json:"role"`
-		Password     string        `json:"password"`
+		Password     string        `json:"password,omitempty"`
 		HashPassword []byte        `json:"hashPassword,omitempty"`
 	}
 	UserStore interface {
 		//GetAll() ([]User, error)
 		CreateUser(User) (bson.ObjectId, error)
-		FindUserByUsername(User) (User, error)
+		FindUser(User) (User, error)
 	}
 )
 
@@ -51,7 +51,7 @@ func (d *DataStore) CreateUser(user User) (bson.ObjectId, error) {
 	return user.Id, nil
 }
 
-func (d *DataStore) FindUserByUsername(user User) (User, error) {
+func (d *DataStore) FindUser(user User) (User, error) {
 	if user.UserName == "" {
 		return User{}, errors.New("Invaid user data")
 	}
