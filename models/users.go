@@ -20,6 +20,7 @@ type (
 	UserStore interface {
 		//GetAll() ([]User, error)
 		CreateUser(User) (bson.ObjectId, error)
+		FindUserByUsername(User) (User, error)
 	}
 )
 
@@ -41,6 +42,7 @@ func (d *DataStore) CreateUser(user User) (bson.ObjectId, error) {
 	}
 	user.HashPassword = hash
 	user.Id = bson.NewObjectId()
+	user.Password = ""
 
 	err = d.C(cNameUsers).Insert(user)
 	if err != nil {
@@ -49,6 +51,22 @@ func (d *DataStore) CreateUser(user User) (bson.ObjectId, error) {
 	return user.Id, nil
 }
 
+func (d *DataStore) FindUserByUsername(user User) (User, error) {
+	if user.UserName == "" {
+		return User{}, errors.New("Invaid user data")
+	}
+
+	foundUser := User{}
+	err := d.C(cNameUsers).Find(bson.M{"username": user.UserName}).One(&foundUser)
+	if err != nil {
+		return User{}, err
+	}
+
+	return foundUser, nil
+}
+
+// Creates appropiate indexs for the user collection
+// Creates an index on 'username' && 'email' field
 func (d *DataStore) UserIndexs() error {
 	index := mgo.Index{
 		Key:        []string{"username"},
