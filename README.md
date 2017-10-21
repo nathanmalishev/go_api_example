@@ -1,4 +1,4 @@
-# GO API Example
+# Go API Example
 
 ## Overview
 Being new to golang there wasn't a whole lot of complete examples out there. This aims to be a nice restfull golang api, that can get you started.  
@@ -6,5 +6,12 @@ Being new to golang there wasn't a whole lot of complete examples out there. Thi
 Throughout this API i tried to avoid global objects & make each function as functional as possible.  
 Trying to have every function, explicitly have everything it needs as arguments.  
 
+## Running
+Make sure the environment variables `JWT_SECRET`, `MONGO_USERNAME`, `MONGO_PASSWORD` are set.  
+The other configs are configured in `common/config.json` at the moment.  
+To run the API use the following command  
+`MONGO_USERNAME= MONGO_PASSWORD= JWT_SECRET="super_secret_pls_change_me" go run router.go main.go`
 
+## Testing
+To run all of the tests run `JWT_SECRET="test" go test ./...`
 
