@@ -3,7 +3,6 @@ package models
 import (
 	"log"
 
-	"github.com/nathanmalishev/taskmanager/common"
 	mgo "gopkg.in/mgo.v2"
 )
 
@@ -17,16 +16,17 @@ type (
 	}
 	DataStore struct {
 		Session *mgo.Session
+		DbName  string
 	}
 )
 
 /* getters / setters */
-func CreateStore(dialInfo *mgo.DialInfo) *DataStore {
+func CreateStore(dialInfo *mgo.DialInfo, dbName string) *DataStore {
 	session, err := mgo.DialWithInfo(dialInfo)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return &DataStore{session}
+	return &DataStore{session, dbName}
 }
 
 func (d *DataStore) GetStore() *DataStore {
@@ -34,7 +34,7 @@ func (d *DataStore) GetStore() *DataStore {
 		log.Fatal("There is no session active")
 	}
 	// important, open new session for concurreny
-	return &DataStore{d.Session.Copy()}
+	return &DataStore{d.Session.Copy(), d.DbName}
 
 }
 
@@ -52,5 +52,5 @@ func (d *DataStore) InitIndexs() error {
 
 /* general database functions */
 func (d *DataStore) C(collection string) *mgo.Collection {
-	return d.Session.DB(common.AppConfig.DbName).C(collection)
+	return d.Session.DB(d.DbName).C(collection)
 }

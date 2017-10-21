@@ -20,7 +20,7 @@ func main() {
 		Database: common.AppConfig.DbName,
 		Password: common.AppConfig.MongoPassword,
 		Timeout:  time.Second * 5,
-	})
+	}, common.AppConfig.DbName)
 
 	/* initialize indexs */
 	err := store.InitIndexs()
