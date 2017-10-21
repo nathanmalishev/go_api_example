@@ -14,6 +14,7 @@ type (
 		UserStore
 		TaskStore
 	}
+	// Implementation of the DataStorer
 	DataStore struct {
 		Session *mgo.Session
 		DbName  string
@@ -29,15 +30,16 @@ func CreateStore(dialInfo *mgo.DialInfo, dbName string) *DataStore {
 	return &DataStore{session, dbName}
 }
 
+// Returns a new data store with a copy of the mgo session
 func (d *DataStore) GetStore() *DataStore {
 	if d.Session == nil {
 		log.Fatal("There is no session active")
 	}
 	// important, open new session for concurreny
 	return &DataStore{d.Session.Copy(), d.DbName}
-
 }
 
+// Closes the mgo session, within the DataStore
 func (d *DataStore) Close() {
 	if d.Session == nil {
 		log.Fatal("You cannot close an empty session")

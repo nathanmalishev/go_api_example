@@ -35,7 +35,3 @@ func (d *DataStore) GetAllTasksByUserId(userId bson.ObjectId) ([]Task, error) {
 	}
 	return tasks, nil
 }
-
-func (d *DataStore) InsertTask(t Task) error {
-	return d.C(cNameTasks).Insert(t)
-}

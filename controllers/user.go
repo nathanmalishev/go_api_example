@@ -9,6 +9,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+/* Registers a user that includes all the common fields from models.User */
 func Register(authMod common.Authorizer, d models.UserStore, w http.ResponseWriter, r *http.Request) {
 
 	//get data from request

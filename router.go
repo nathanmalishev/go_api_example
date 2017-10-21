@@ -40,11 +40,11 @@ func InitRoutes(store models.DataStorer, authModule common.Authorizer) http.Hand
 		negroni.NewLogger(),
 	)
 
-	// will add auth middleware to these routes soon
 	router.PathPrefix("/tasks").Handler(negroni.New(
 		common.WithAuth(authModule),
 		negroni.Wrap(taskRouter),
 	))
+
 	// common wraps all routes in default middleware
 	// this includes all API hits
 	commonMidleware.UseHandler(router)

@@ -27,6 +27,8 @@ type (
 const cNameUsers = "users"
 
 /* User store database interactions */
+
+//Creates a user in the database, must have email, role, username & password set
 func (d *DataStore) CreateUser(user User) (bson.ObjectId, error) {
 
 	//Data check
@@ -51,6 +53,7 @@ func (d *DataStore) CreateUser(user User) (bson.ObjectId, error) {
 	return user.Id, nil
 }
 
+// Find a specific user
 func (d *DataStore) FindUser(user User) (User, error) {
 	if user.UserName == "" {
 		return User{}, errors.New("Invaid user data")

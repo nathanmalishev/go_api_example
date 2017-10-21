@@ -23,6 +23,7 @@ var (
 	JwtHTTPError = "No valid JWT attached"
 )
 
+//Writes common errors, only displays message field back to the user
 func DisplayAppError(w http.ResponseWriter, handlerError error, message string, code int) {
 	errObj := appError{
 		//	Error:      handlerError.Error(),
@@ -37,6 +38,7 @@ func DisplayAppError(w http.ResponseWriter, handlerError error, message string, 
 	}
 }
 
+// Writes common json responses.
 func WriteJson(w http.ResponseWriter, message string, data interface{}, code int) {
 
 	mess := AppResponse{

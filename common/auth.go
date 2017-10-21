@@ -14,6 +14,7 @@ type (
 		GenerateJWT(string, string, bson.ObjectId) (string, error)
 		Authorize(string) (*jwt.Token, error)
 	}
+	/* Implements the Authorizer interface */
 	Auth struct {
 		Secret        []byte
 		SigningMethod jwt.SigningMethod
