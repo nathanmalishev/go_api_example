@@ -21,7 +21,8 @@ var AppConfig *Config
 func readConfig(filename string) *Config {
 	file, err := os.Open(filename)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("no config file found, using defaults")
+		return &Config{}
 	}
 	decoder := json.NewDecoder(file)
 
