@@ -13,7 +13,6 @@ type (
 		Id           bson.ObjectId `bson:"_id,omitempty" json:"id,omitempty"`
 		UserName     string        `json:"username"`
 		Email        string        `json:"email"`
-		Role         string        `json:"role"`
 		Password     string        `json:"password,omitempty"`
 		HashPassword []byte        `json:"hashPassword,omitempty"`
 	}
@@ -28,12 +27,12 @@ const cNameUsers = "users"
 
 /* User store database interactions */
 
-//Creates a user in the database, must have email, role, username & password set
+//Creates a user in the database, must have email, username & password set
 func (d *DataStore) CreateUser(user User) (bson.ObjectId, error) {
 
 	//Data check
-	//Must have UserName, password, email & role --- in this example we can obv have weak passwords 😿
-	if user.Password == "" || user.Role == "" || user.Email == "" || user.UserName == "" {
+	//Must have UserName, password & email --- in this example we can have weak passwords or invalid emails 😿
+	if user.Password == "" || user.Email == "" || user.UserName == "" {
 		return "", errors.New("Invalid user data, field is missing")
 	}
 

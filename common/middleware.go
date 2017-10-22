@@ -36,10 +36,8 @@ func WithAuth(a Authorizer) negroni.Handler {
 		userContext := UserClaims{}
 		// handle claims
 		if claims, ok := jwtToken.Claims.(*AppClaims); ok {
-			//fmt.Printf("%s, %s, %s\n", claims.Username, claims.Role, claims.UserId)
 			userContext = UserClaims{
 				Username: claims.Username,
-				Role:     claims.Role,
 				UserId:   claims.UserId,
 			}
 		} else {

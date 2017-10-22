@@ -12,7 +12,6 @@ import (
 type CreatedUser struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
-	Role     string `json:"role"`
 	JWT      string `json:"jwt"`
 }
 
@@ -38,7 +37,6 @@ func Register(authMod common.Authorizer, d models.UserStore, w http.ResponseWrit
 	//create JWT
 	jwt, err := authMod.GenerateJWT(
 		body.UserName,
-		body.Role,
 		userId,
 	)
 	if err != nil {
@@ -48,7 +46,6 @@ func Register(authMod common.Authorizer, d models.UserStore, w http.ResponseWrit
 	returnUser := CreatedUser{
 		body.UserName,
 		body.Email,
-		body.Role,
 		jwt,
 	}
 	common.WriteJson(w, "Succesfully registered user", returnUser, http.StatusCreated)
@@ -87,7 +84,6 @@ func Login(authMod common.Authorizer, d models.UserStore, w http.ResponseWriter,
 	// generate a fresh JWT
 	jwt, err := authMod.GenerateJWT(
 		user.UserName,
-		user.Role,
 		user.Id,
 	)
 	if err != nil {
@@ -97,7 +93,6 @@ func Login(authMod common.Authorizer, d models.UserStore, w http.ResponseWriter,
 	returnUser := CreatedUser{
 		user.UserName,
 		user.Email,
-		user.Role,
 		jwt,
 	}
 

@@ -11,7 +11,7 @@ import (
 
 type (
 	Authorizer interface {
-		GenerateJWT(string, string, bson.ObjectId) (string, error)
+		GenerateJWT(string, bson.ObjectId) (string, error)
 		Authorize(string) (*jwt.Token, error)
 	}
 	/* Implements the Authorizer interface */
@@ -27,18 +27,16 @@ type (
 
 	//Used in middleware and attached to the context
 	UserClaims struct {
-		Role     string
 		Username string
 		UserId   bson.ObjectId
 	}
 )
 
 // generates a new JWT token
-func (a *Auth) GenerateJWT(name string, role string, userId bson.ObjectId) (string, error) {
+func (a *Auth) GenerateJWT(name string, userId bson.ObjectId) (string, error) {
 	claims := AppClaims{
 		UserClaims{
 			Username: name,
-			Role:     role,
 			UserId:   userId,
 		},
 		jwt.StandardClaims{

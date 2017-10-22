@@ -57,7 +57,7 @@ func TestLogin(t *testing.T) {
 
 func UserShouldRegister(r *mux.Router) func(t *testing.T) {
 	return func(t *testing.T) {
-		data := `{"username": "nathan", "password": "apple", "email":"nathan.email", "role":"student"}`
+		data := `{"username": "nathan", "password": "apple", "email":"nathan.email"}`
 		req, err := http.NewRequest("POST", "/users", strings.NewReader(data))
 		if err != nil {
 			t.Error(err)
@@ -108,7 +108,7 @@ func UserShouldLogin(r *mux.Router) func(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		if result.Data.Username != "nathan" || result.Data.Email != "nathan.email" || result.Data.Role != "student" {
+		if result.Data.Username != "nathan" || result.Data.Email != "nathan.email" {
 			t.Fail()
 		}
 		if result.Data.JWT == "" || result.Message != "success" {
