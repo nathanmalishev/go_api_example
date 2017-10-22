@@ -30,7 +30,7 @@ func InitRoutes(store models.DataStorer, authModule common.Authorizer) http.Hand
 	taskRouter := mux.NewRouter().StrictSlash(false)
 	taskRouter.Handle("/tasks", controllers.WithDb(store, controllers.GetAllTasks)).Methods("GET")
 	taskRouter.Handle("/tasks/{id}", controllers.WithDb(store, controllers.GetTask)).Methods("GET")
-	taskRouter.Handle("/tasks/{id}", dummy()).Methods("DELETE")
+	taskRouter.Handle("/tasks/{id}", controllers.WithDb(store, controllers.DeleteTask)).Methods("DELETE")
 	taskRouter.Handle("/tasks", controllers.WithDb(store, controllers.CreateTask)).Methods("POST")
 	taskRouter.Handle("/tasks/{id}", dummy()).Methods("PUT")
 	taskRouter.Handle("/tasks/users/{id}", dummy()).Methods("GET")

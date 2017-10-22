@@ -66,3 +66,22 @@ func CreateTask(d models.TaskStore, w http.ResponseWriter, r *http.Request) {
 	common.WriteJson(w, "success", &createdTask, http.StatusOK)
 
 }
+
+func DeleteTask(d models.TaskStore, w http.ResponseWriter, r *http.Request) {
+	// get userId
+	userClaims := r.Context().Value("userContext").(*common.UserClaims)
+	userId := userClaims.UserId
+	// get taskId
+	taskId := mux.Vars(r)["id"]
+	if !bson.IsObjectIdHex(taskId) {
+		common.DisplayAppError(w, errors.New("taskId is not objectId"), common.FetchError, http.StatusInternalServerError)
+		return
+	}
+	deletedTask := models.Task{}
+	deletedTask, err := d.DeleteTaskByUserIdAndTaskId(userId, bson.ObjectIdHex(taskId))
+	if err != nil {
+		common.DisplayAppError(w, err, common.InvalidData, http.StatusInternalServerError)
+		return
+	}
+	common.WriteJson(w, "success", &deletedTask, http.StatusOK)
+}

@@ -23,6 +23,7 @@ type (
 		GetAllTasksByUserId(bson.ObjectId) ([]Task, error)
 		GetTaskByUserIdAndTaskId(bson.ObjectId, bson.ObjectId) (Task, error)
 		CreateTask(Task) (Task, error)
+		DeleteTaskByUserIdAndTaskId(bson.ObjectId, bson.ObjectId) (Task, error)
 	}
 )
 
@@ -42,7 +43,7 @@ func (d *DataStore) GetTaskByUserIdAndTaskId(userId bson.ObjectId, taskId bson.O
 	task := Task{}
 	err := d.C(cNameTasks).Find(bson.M{"userid": userId, "_id": taskId}).One(&task)
 	if err != nil {
-		return task, err
+		return Task{}, err
 	}
 	return task, nil
 }
@@ -51,6 +52,18 @@ func (d *DataStore) CreateTask(task Task) (Task, error) {
 	task.CreatedOn = time.Now()
 	task.Id = bson.NewObjectId()
 	err := d.C(cNameTasks).Insert(task)
+	if err != nil {
+		return Task{}, err
+	}
+	return task, nil
+}
+
+func (d *DataStore) DeleteTaskByUserIdAndTaskId(userId bson.ObjectId, taskId bson.ObjectId) (Task, error) {
+	task, err := d.GetTaskByUserIdAndTaskId(userId, taskId)
+	if err != nil {
+		return Task{}, err
+	}
+	err = d.C(cNameTasks).Remove(bson.M{"userid": userId, "_id": taskId})
 	if err != nil {
 		return Task{}, err
 	}
