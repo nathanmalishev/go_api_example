@@ -28,28 +28,44 @@ func TestMain(m *testing.M) {
 	os.Exit(retCode)
 }
 
+var globalUser = models.User{UserName: "nathan", Email: "nathan@gmail.com", Password: "test", HashPassword: []byte(""), Id: bson.NewObjectId()}
+
 func TestFindUser(t *testing.T) {
 	dataStore := models.DataStore{}
 	dataStore.Session = server.Session()
 
+	t.Run("CreateUser", CreateUser(&dataStore))
 	t.Run("UserShouldExist", UserShouldExist(&dataStore))
 	t.Run("UserShouldNotExist", UserShouldNotExist(&dataStore))
 
 	dataStore.Close() // close session
 }
 
-func UserShouldExist(dataStore *models.DataStore) func(t *testing.T) {
+func CreateUser(dataStore *models.DataStore) func(t *testing.T) {
 	return func(t *testing.T) {
-		userExists := models.User{UserName: "nathan", Email: "nathan@gmail.com", Password: "test", HashPassword: []byte(""), Id: bson.NewObjectId()}
-		if err := dataStore.C("users").Insert(userExists); err != nil {
+
+		user, err := dataStore.CreateUser(globalUser)
+		if err != nil {
 			t.Error(err)
 		}
+		if reflect.DeepEqual(user, globalUser) {
+			t.Error()
+		}
+	}
+}
+
+func UserShouldExist(dataStore *models.DataStore) func(t *testing.T) {
+	return func(t *testing.T) {
 		user, err := dataStore.FindUser(models.User{UserName: "nathan"})
 		if err != nil {
 			t.Error(err)
 		}
-		if reflect.DeepEqual(user, userExists) != true {
-			t.Error(err)
+		if user.HashPassword != nil {
+			if user.UserName == globalUser.UserName && user.Email == globalUser.Email && user.Id == globalUser.Id {
+				t.Error()
+			}
+		} else {
+			t.Error()
 		}
 	}
 }
