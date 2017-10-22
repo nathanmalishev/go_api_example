@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"gopkg.in/mgo.v2/bson"
@@ -24,6 +25,7 @@ type (
 		GetTaskByUserIdAndTaskId(bson.ObjectId, bson.ObjectId) (Task, error)
 		CreateTask(Task) (Task, error)
 		DeleteTaskByUserIdAndTaskId(bson.ObjectId, bson.ObjectId) (Task, error)
+		UpdateTaskByUserIdAndTaskID(Task, bson.ObjectId, bson.ObjectId) (Task, error)
 	}
 )
 
@@ -68,4 +70,24 @@ func (d *DataStore) DeleteTaskByUserIdAndTaskId(userId bson.ObjectId, taskId bso
 		return Task{}, err
 	}
 	return task, nil
+}
+
+func (d *DataStore) UpdateTaskByUserIdAndTaskID(newTask Task, userId bson.ObjectId, taskId bson.ObjectId) (Task, error) {
+
+	fmt.Println(newTask)
+
+	err := d.C(cNameTasks).Update(bson.M{"userid": userId, "_id": taskId},
+		bson.M{"$set": bson.M{
+			"name":        newTask.Name,
+			"description": newTask.Description,
+			"due":         newTask.Due,
+			"status":      newTask.Status,
+			"tags":        newTask.Tags,
+		}})
+	if err != nil {
+		return Task{}, err
+	}
+	newTask.UserId = userId
+	newTask.Id = taskId
+	return newTask, nil
 }

@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -84,4 +85,33 @@ func DeleteTask(d models.TaskStore, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	common.WriteJson(w, "success", &deletedTask, http.StatusOK)
+}
+
+func UpdateTask(d models.TaskStore, w http.ResponseWriter, r *http.Request) {
+	// get userId
+	userClaims := r.Context().Value("userContext").(*common.UserClaims)
+	userId := userClaims.UserId
+	// get taskId
+	taskId := mux.Vars(r)["id"]
+	if !bson.IsObjectIdHex(taskId) {
+		common.DisplayAppError(w, errors.New("taskId is not objectId"), common.FetchError, http.StatusInternalServerError)
+		return
+	}
+	taskIdObj := bson.ObjectIdHex(taskId)
+
+	newTask := models.Task{} // dependent on models.Task, but doesn't come in through params :/
+	err := json.NewDecoder(r.Body).Decode(&newTask)
+	if err != nil {
+		common.DisplayAppError(w, err, common.InvalidData, http.StatusInternalServerError)
+		return
+	}
+
+	updatedTask := models.Task{}
+	updatedTask, err = d.UpdateTaskByUserIdAndTaskID(newTask, userId, taskIdObj)
+	if err != nil {
+		fmt.Println("ERRORAAAAA")
+		common.DisplayAppError(w, err, common.InvalidData, http.StatusInternalServerError)
+		return
+	}
+	common.WriteJson(w, "success", &updatedTask, http.StatusOK)
 }
