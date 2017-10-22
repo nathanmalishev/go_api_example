@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -28,7 +29,10 @@ func GetAllTasks(d models.TaskStore, w http.ResponseWriter, r *http.Request) {
 func GetTask(d models.TaskStore, w http.ResponseWriter, r *http.Request) {
 	// get task_id
 	taskId := mux.Vars(r)["id"]
-	// not sure how to convert this to a bson.ObjectId(taskId) -- would be ideal
+	if !bson.IsObjectIdHex(taskId) {
+		common.DisplayAppError(w, errors.New("taskId is not objectId"), common.FetchError, http.StatusInternalServerError)
+		return
+	}
 
 	userClaims := r.Context().Value("userContext").(*common.UserClaims)
 	task, err := d.GetTaskByUserIdAndTaskId(userClaims.UserId, bson.ObjectIdHex(taskId))
