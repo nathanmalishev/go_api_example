@@ -34,6 +34,7 @@ func readConfig(filename string) *Config {
 }
 
 func readEnv(c *Config) {
+	c.Server = os.Getenv("SERVER_ADDR")
 	c.MongoUsername = os.Getenv("MONGO_USERNAME")
 	c.MongoPassword = os.Getenv("MONGO_PASSWORD")
 	if c.MongoPassword == "" || c.MongoUsername == "" {
