@@ -1,29 +1,30 @@
 package models_test
 
 import (
-	"io/ioutil"
 	"os"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/nathanmalishev/go_api_example/models"
+	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"gopkg.in/mgo.v2/dbtest"
 )
 
-var server dbtest.DBServer
+var Store *models.DataStore
 
 func TestMain(m *testing.M) {
 	// startup
-	d, _ := ioutil.TempDir(os.TempDir(), "mongotools-test")
-	server = dbtest.DBServer{}
-	server.SetPath(d)
+	Store = models.CreateStore(&mgo.DialInfo{
+		Addrs:   []string{"127.0.0.1"},
+		Timeout: time.Second * 5,
+	}, "test_db")
 
 	retCode := m.Run()
 
 	// teardown
-	server.Wipe()
-	server.Stop()
+	Store.Session.DB("test_db").DropDatabase()
+	Store.Close()
 
 	os.Exit(retCode)
 }
@@ -31,20 +32,17 @@ func TestMain(m *testing.M) {
 var globalUser = models.User{UserName: "nathan", Email: "nathan@gmail.com", Password: "test", HashPassword: []byte(""), Id: bson.NewObjectId()}
 
 func TestFindUser(t *testing.T) {
-	dataStore := models.DataStore{}
-	dataStore.Session = server.Session()
 
-	t.Run("CreateUser", CreateUser(&dataStore))
-	t.Run("UserShouldExist", UserShouldExist(&dataStore))
-	t.Run("UserShouldNotExist", UserShouldNotExist(&dataStore))
+	t.Run("CreateUser", CreateUser(Store))
+	t.Run("UserShouldExist", UserShouldExist(Store))
+	t.Run("UserShouldNotExist", UserShouldNotExist(Store))
 
-	dataStore.Close() // close session
 }
 
-func CreateUser(dataStore *models.DataStore) func(t *testing.T) {
+func CreateUser(Store models.DataStorer) func(t *testing.T) {
 	return func(t *testing.T) {
 
-		user, err := dataStore.CreateUser(globalUser)
+		user, err := Store.CreateUser(globalUser)
 		if err != nil {
 			t.Error(err)
 		}
@@ -54,9 +52,9 @@ func CreateUser(dataStore *models.DataStore) func(t *testing.T) {
 	}
 }
 
-func UserShouldExist(dataStore *models.DataStore) func(t *testing.T) {
+func UserShouldExist(Store models.DataStorer) func(t *testing.T) {
 	return func(t *testing.T) {
-		user, err := dataStore.FindUser(models.User{UserName: "nathan"})
+		user, err := Store.FindUser(models.User{UserName: "nathan"})
 		if err != nil {
 			t.Error(err)
 		}
@@ -70,13 +68,13 @@ func UserShouldExist(dataStore *models.DataStore) func(t *testing.T) {
 	}
 }
 
-func UserShouldNotExist(dataStore *models.DataStore) func(t *testing.T) {
+func UserShouldNotExist(Store models.DataStorer) func(t *testing.T) {
 	return func(t *testing.T) {
 		userExists := models.User{UserName: "nathan", Email: "nathan@gmail.com", Password: "test", HashPassword: []byte(""), Id: bson.NewObjectId()}
-		if err := dataStore.C("users").Insert(userExists); err != nil {
+		if err := Store.C("users").Insert(userExists); err != nil {
 			t.Error(err)
 		}
-		_, err := dataStore.FindUser(models.User{UserName: "nathan1"})
+		_, err := Store.FindUser(models.User{UserName: "nathan1"})
 		if err != nil {
 			if err.Error() != "not found" {
 				t.Error(err)

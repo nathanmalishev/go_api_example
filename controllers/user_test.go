@@ -2,34 +2,35 @@ package controllers_test
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	"github.com/nathanmalishev/go_api_example/common"
 	"github.com/nathanmalishev/go_api_example/controllers"
 	"github.com/nathanmalishev/go_api_example/models"
-	"gopkg.in/mgo.v2/dbtest"
+	mgo "gopkg.in/mgo.v2"
 )
 
-var server dbtest.DBServer
+var Store *models.DataStore
 
 func TestMain(m *testing.M) {
 	// startup
-	d, _ := ioutil.TempDir(os.TempDir(), "mongotools-test")
-	server = dbtest.DBServer{}
-	server.SetPath(d)
+	Store = models.CreateStore(&mgo.DialInfo{
+		Addrs:   []string{"127.0.0.1"},
+		Timeout: time.Second * 5,
+	}, "test_db")
 
 	retCode := m.Run()
 
 	// teardown
-	server.Wipe()
-	server.Stop()
+	Store.Session.DB("test_db").DropDatabase()
+	Store.Close()
 
 	os.Exit(retCode)
 }
@@ -37,22 +38,18 @@ func TestMain(m *testing.M) {
 func TestLogin(t *testing.T) {
 	r := mux.NewRouter()
 
-	store := &models.DataStore{}
-	store.Session = server.Session()
-
 	auth := &common.Auth{
 		Secret:        common.AppConfig.JwtSecret,
 		SigningMethod: jwt.SigningMethodHS512,
 	}
 
-	r.HandleFunc("/users", controllers.WithDbAndAuth(auth, store, controllers.Register)).Methods("POST")
-	r.HandleFunc("/users/login", controllers.WithDbAndAuth(auth, store, controllers.Login)).Methods("POST")
+	r.HandleFunc("/users", controllers.WithDbAndAuth(auth, Store, controllers.Register)).Methods("POST")
+	r.HandleFunc("/users/login", controllers.WithDbAndAuth(auth, Store, controllers.Login)).Methods("POST")
 
 	t.Run("ShouldBeAbleToRegister", UserShouldRegister(r))
 	t.Run("UserShouldBeAbleToLogin", UserShouldLogin(r))
 	t.Run("UserShouldNotBeAbleToLogin", UserShouldNotLogin(r))
 
-	store.Close()
 }
 
 func UserShouldRegister(r *mux.Router) func(t *testing.T) {

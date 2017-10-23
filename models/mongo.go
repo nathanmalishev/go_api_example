@@ -13,6 +13,7 @@ type (
 		InitIndexs() error
 		UserStore
 		TaskStore
+		C(string) *mgo.Collection
 	}
 	// Implementation of the DataStorer
 	DataStore struct {
