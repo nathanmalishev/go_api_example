@@ -2,6 +2,7 @@ package common
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -21,7 +22,7 @@ func WithAuth(a Authorizer) negroni.Handler {
 			token = strings.TrimPrefix(token, "Bearer ")
 		}
 		if token == "" {
-			http.Error(rw, JwtHTTPError, http.StatusUnauthorized)
+			DisplayAppError(rw, errors.New(""), JwtHTTPError, http.StatusUnauthorized)
 			return
 		}
 
@@ -29,7 +30,7 @@ func WithAuth(a Authorizer) negroni.Handler {
 		jwtToken, err := a.Authorize(token)
 		if err != nil {
 			fmt.Printf("Error decoding token:%s, err:%s\n", jwtToken, err)
-			http.Error(rw, JwtHTTPError, http.StatusUnauthorized)
+			DisplayAppError(rw, err, JwtHTTPError, http.StatusUnauthorized)
 			return
 		}
 
@@ -42,7 +43,7 @@ func WithAuth(a Authorizer) negroni.Handler {
 			}
 		} else {
 			fmt.Printf("Error decoding claims, token:%s, err:", token, err)
-			http.Error(rw, JwtHTTPError, http.StatusUnauthorized)
+			DisplayAppError(rw, err, JwtHTTPError, http.StatusUnauthorized)
 			return
 		}
 
