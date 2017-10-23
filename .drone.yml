@@ -1,7 +1,21 @@
+workspace:
+  base: /go
+  path: src/github.com/nathanmalishev/go_api_example
+
 pipeline:
   build:
-    image: golang
+    image: golang:1.9
+
+    environment:
+    - JWT_SECRET=test
+
     commands:
-      - go get
-      - go build
-      - JWT_SECRET="a" go test ./...
+    - go get
+    - go build
+    - go test ./... -v
+
+
+services:
+  mongo:
+    image: mongo
+    ports: '27017:27017'
