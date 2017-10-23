@@ -1,0 +1,7 @@
+pipeline:
+  build:
+    image: golang
+    commands:
+      - go get
+      - go build
+      - JWT_SECRET="a" go test ./...
