@@ -34,9 +34,8 @@ func WithDbAndAuth(
 }
 
 func Healthcheck(w http.ResponseWriter, r *http.Request) {
-
 	motd := struct {
-		motd string `json:"motd"`
+		Motd string `json:"motd"`
 	}{"Welcome gopher"}
 
 	common.WriteJson(w, "healthy", motd, http.StatusOK)
