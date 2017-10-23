@@ -22,7 +22,15 @@ pipeline:
     secrets: [ docker_username, docker_password ]
     tags: 
       - latest
-
+  rancher:
+    image: peloton/drone-rancher
+    url: https://rancher.nathanmalishev.com
+    access_key: ${RANCHER_ACCESS_KEY}
+    secret_key: ${RANCHER_SECRET_KEY}
+    service: example/go
+    docker_image: nathanmalishev/go_api_example:latest
+    confirm: true
+    timeout: 240
 services:
   mongo:
     image: mongo
