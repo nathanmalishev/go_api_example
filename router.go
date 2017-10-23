@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -11,15 +10,11 @@ import (
 	"github.com/urfave/negroni"
 )
 
-func dummy() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Yet to be implemented")
-		return
-	})
-}
-
 func InitRoutes(store models.DataStorer, authModule common.Authorizer) http.Handler {
 	router := mux.NewRouter().StrictSlash(false)
+
+	/* healthcheck / motd */
+	router.Handle("/", http.HandlerFunc(controllers.Healthcheck)).Methods("GET")
 
 	/* User routes */
 	router.Handle("/users", controllers.WithDbAndAuth(authModule, store, controllers.Register)).Methods("POST")

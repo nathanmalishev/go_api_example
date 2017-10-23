@@ -32,3 +32,12 @@ func WithDbAndAuth(
 		fn(authModule, models.UserStore(newStore), w, r)
 	})
 }
+
+func Healthcheck(w http.ResponseWriter, r *http.Request) {
+
+	motd := struct {
+		motd string `json:"motd"`
+	}{"Welcome gopher"}
+
+	common.WriteJson(w, "healthy", motd, http.StatusOK)
+}
