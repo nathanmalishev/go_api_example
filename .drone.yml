@@ -14,6 +14,14 @@ pipeline:
     - go build
     - go test ./... -v
 
+  publish:
+    image: plugins/docker
+    repo: nathanmalishev/go_api_example
+    username: ${DOCKER_USERNAME}
+    password: ${DOCKER_PASSWORD}
+    when:
+      branch: master
+
 services:
   mongo:
     image: mongo
