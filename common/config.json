@@ -1,5 +1,0 @@
-{
-  "Server":    "localhost:8080",
-  "MongoServer": "127.0.0.1",
-  "DbName": "taskmanager"
-}
