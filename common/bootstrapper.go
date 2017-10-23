@@ -50,6 +50,6 @@ func readEnv(c *Config) {
 }
 
 func init() {
-	AppConfig := Config{}
-	readEnv(&AppConfig)
+	AppConfig = &Config{}
+	readEnv(AppConfig)
 }
