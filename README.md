@@ -1,7 +1,7 @@
 # Go API Example
-
+[![Build Status](https://drone.nathanmalishev.com/api/badges/nathanmalishev/go_api_example/status.svg)](https://drone.nathanmalishev.com/nathanmalishev/go_api_example)
 ## Overview
-Being new to golang there wasn't a whole lot of complete examples out there. This aims to be a nice restfull golang api, that can get you started.  
+Being new to golang there wasn't a whole lot of complete examples out there. This aims to be a nice restfull golang api, that can get you started with.  
 
 ## Running
 Make sure the environment variables `JWT_SECRET`, `MONGO_USERNAME`, `MONGO_PASSWORD` are set.  
