@@ -19,6 +19,9 @@ pipeline:
     repo: nathanmalishev/go_api_example
     when:
       branch: master
+    secrets: [ docker_username, docker_password ]
+    tags: 
+      - latest
 
 services:
   mongo:
