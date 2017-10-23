@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/nathanmalishev/taskmanager/common"
-	"github.com/nathanmalishev/taskmanager/controllers"
-	"github.com/nathanmalishev/taskmanager/models"
+	"github.com/nathanmalishev/go_api_example/common"
+	"github.com/nathanmalishev/go_api_example/controllers"
+	"github.com/nathanmalishev/go_api_example/models"
 	"github.com/urfave/negroni"
 )
 

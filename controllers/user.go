@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/nathanmalishev/taskmanager/common"
-	"github.com/nathanmalishev/taskmanager/models"
+	"github.com/nathanmalishev/go_api_example/common"
+	"github.com/nathanmalishev/go_api_example/models"
 	"golang.org/x/crypto/bcrypt"
 )
 

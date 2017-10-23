@@ -7,8 +7,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/nathanmalishev/taskmanager/common"
-	"github.com/nathanmalishev/taskmanager/models"
+	"github.com/nathanmalishev/go_api_example/common"
+	"github.com/nathanmalishev/go_api_example/models"
 	"gopkg.in/mgo.v2/bson"
 )
 

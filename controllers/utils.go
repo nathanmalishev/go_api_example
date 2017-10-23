@@ -3,8 +3,8 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/nathanmalishev/taskmanager/common"
-	"github.com/nathanmalishev/taskmanager/models"
+	"github.com/nathanmalishev/go_api_example/common"
+	"github.com/nathanmalishev/go_api_example/models"
 )
 
 // With db wraps each controller that needs the db with a new session

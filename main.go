@@ -6,8 +6,8 @@ import (
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/nathanmalishev/taskmanager/common"
-	"github.com/nathanmalishev/taskmanager/models"
+	"github.com/nathanmalishev/go_api_example/common"
+	"github.com/nathanmalishev/go_api_example/models"
 	mgo "gopkg.in/mgo.v2"
 )
 
