@@ -22,8 +22,10 @@ var Store *models.DataStore
 func TestMain(m *testing.M) {
 	// startup
 	Store = models.CreateStore(&mgo.DialInfo{
-		Addrs:   []string{"127.0.0.1"},
-		Timeout: time.Second * 5,
+		Addrs:    []string{"mongo"},
+		Username: "",
+		Password: "",
+		Timeout:  time.Second * 5,
 	}, "test_db")
 
 	retCode := m.Run()
